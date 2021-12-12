@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from rest_framework.decorators import api_view,authentication_classes,permission_classes
+
+from accounts.models import IsSuperUser
 from .serializers import Adminserializer, CustomUserserializer,CustomerLoginserializer
 from django.contrib.auth import get_user_model,authenticate
 from drf_yasg.utils import swagger_auto_schema
@@ -99,7 +101,7 @@ def customerlogin(request):
 #get all customers
 @api_view(["GET",])
 @authentication_classes([BasicAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsSuperUser])
 def get_customers(request):
     if request.method =="GET":
         all_users = User.objects.all()

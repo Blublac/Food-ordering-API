@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'main',
+    'order',
      #used for documentation
     'drf_yasg',
     'coreapi',

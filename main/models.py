@@ -1,18 +1,53 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.deletion import CASCADE
-from accounts.models import CustomUser
-import random
+import uuid
 
-def generate_order_no():
-    order_n = int(random.randint(3010000000, 3019999999))
-    return order_n
+class Category(models.Model):
+    category_choices=(
+        ('Bakery',('cake','cookies','bread','pies','pizza')),
+        ('rice',('jollof rice','fried rice','chinese rice','rice & stew','coconut rice')),
+        ('roast',('corn','beans & roasted plantain','bole','roasted chicken')),
+        ('barbeque',('grilled chicken','grilled beef','grilled fish','suya')),
+        ('sharwarma',('chicken','beef','chicken jumbo+2hotdog','beef jumbo+2hotdog')),
+    )
+    
+    category = models.CharField(max_length=100,null = True,blank=True,unique=True)
+    subcategory = models.CharField(max_length=100,default=category_choices, unique=True)
+    details = models.TextField()
+
+    class Meta:
+        verbose_name = 'catergory'
+        verbose_name_plural = "Categories"
+    
+    def __str__(self):
+        return self.category
 
 
-class Orders(models.Model):
-    user = models.ForeignKey (CustomUser,on_delete=CASCADE)
-    order_no = models.IntegerField(default=generate_order_no,unique=True,editable=False)
-    order = models.CharField(max_length=100)
-    order_date = models.DateField(auto_now=True)
-    time = models.TimeField(auto_now=True)
 
+class Food(models.Model):
+    category = models.ForeignKey(Category,on_delete=CASCADE)
+    sku_no = models.UUIDField(primary_key= True, default=uuid.uuid4,unique=True,editable=False)
+    food = models.CharField(max_length=100,unique=True)
+    created = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField()
+
+
+
+    class Meta:
+        verbose_name = 'Food'
+        verbose_name_plural = "Foods"
+
+
+
+    def __str__(self):
+        return self.food
+
+
+    
+    def delete(self):
+        self.is_active = False
+        self.save()
+        return
+    
