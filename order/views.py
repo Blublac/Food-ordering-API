@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import BasicAuthentication
@@ -19,11 +19,167 @@ User = get_user_model()
 @permission_classes([IsSuperUser])
 def orders (request):
     if request.method == 'GET':
-        all_orders = Order.objects.all(is_active = True)
-        serializer = Orderserializer(all_orders)
+        all_orders = Order.objects.all()
+        serializer = Orderserializer(all_orders,many = True)
         data = {
             "status":True,
             "message": "successful",
             "data": serializer.data
         }
         return Response(data,status=status.HTTP_200_OK)
+
+
+#this is to place an order
+@swagger_auto_schema(methods=["POST"],request_body=Orderserializer())
+@api_view (["POST"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def place_order(request):
+    if request.method =="POST":
+        serializer = Orderserializer(data =request.data)
+        if serializer.is_valid():
+            if 'user' in serializer.validated_data.keys():
+                serializer.validated_data.pop('user')
+            orders = Order.objects.create(**serializer.validated_data,user = request.user)
+            orders_serializer = Orderserializer(orders)
+
+            data={
+                "status": True,
+                "message":"created",
+
+                "data":orders_serializer.data
+            }
+            return Response(data,status=status.HTTP_201_CREATED)
+        
+        else:
+            error={
+                'status':False,
+                "error": serializer.errors
+            }
+            return Response (error,status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view (["GET"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAdminUser])
+def order_scheduled(request,order):
+    if request.method == 'GET':
+        try:
+            schedule = Order.objects.get(order_no = order)
+        except Order.DoesNotExist:
+            data = {
+            "message": "failed",
+            "error": "Order with this order number does not exist"
+            }
+            return Response(data,status.HTTP_404_NOT_FOUND)
+
+
+        if schedule.status == "pending":
+            schedule.status = "scheduled"
+            schedule.save()
+
+            data = {
+                'status': True,
+                'message': 'order scheduled'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+
+        else:
+            data = {
+                'status': False,
+                'data': 'already scheduled'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+
+
+
+@api_view (["GET"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAdminUser])
+def order_delivered(request,order):
+    if request.method == 'GET':
+        try:
+            schedule = Order.objects.get(order_no = order)
+        except Order.DoesNotExist:
+            data = {
+            "message": "failed",
+            "error": "Order with this order number does not exist"
+            }
+            return Response(data,status.HTTP_404_NOT_FOUND)
+
+        if schedule.status == "scheduled":
+            schedule.status = "delivered"
+            schedule.save()
+
+            data = {
+                'status': True,
+                'message': 'order delivered'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+
+        elif schedule.status == "pending":
+
+            data = {
+                'status': False,
+                'message': 'this order is yet to be scheduled'
+            }
+            return Response(data,status.HTTP_403_FORBIDDEN)
+
+
+        
+        else:
+            data = {
+                'status': False,
+                'data': 'already delivered'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+
+
+@api_view (["GET"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAdminUser])
+def order_failed(request,order):
+    if request.method == 'GET':
+        try:
+            schedule = Order.objects.get(order_no = order)
+        except Order.DoesNotExist:
+            data = {
+            "message": "failed",
+            "error": "Order with this order number does not exist"
+            }
+            return Response(data,status.HTTP_404_NOT_FOUND)
+
+        if schedule.status == "scheduled":
+            schedule.status = "failed"
+            schedule.save()
+
+            data = {
+                'status': True,
+                'message': 'delivery failed'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+
+        elif schedule.status == "pending":
+
+            data = {
+                'status': False,
+                'message': 'this order is yet to be scheduled'
+            }
+            return Response(data,status.HTTP_403_FORBIDDEN)
+
+
+        elif schedule.status == "delivered":
+
+            data = {
+                'status': False,
+                'message': 'this order  has been delivered'
+            }
+            return Response(data,status.HTTP_403_FORBIDDEN)
+        
+        else:
+            data = {
+                'status': False,
+                'data': 'cancelled'
+            }
+            return Response(data,status.HTTP_202_ACCEPTED)
+

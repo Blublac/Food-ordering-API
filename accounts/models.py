@@ -61,8 +61,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
 
-    def __str__(self):
-        return self.email
+    def __unicode__(self):
+        return self.email,self.name
     
     def delete(self):
         self.is_active = False

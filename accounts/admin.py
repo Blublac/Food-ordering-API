@@ -6,7 +6,7 @@ from .models import CustomUser
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password', 'name', 'last_login')}),
+        (None,{'fields': ('email', 'password', 'name', 'last_login',)}),
         ('Permissions', {'fields': (
             'is_active',
             'is_staff',
@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
 
-    list_display = ('email', 'name', 'is_staff', 'last_login')
+    list_display = ('email', 'name', 'is_staff', 'last_login','id')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     search_fields = ('email',)
     ordering = ('email',)
@@ -33,3 +33,11 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(CustomUser, UserAdmin)
+
+
+
+
+# @admin.register(CustomUser)
+# class UserAdmin (admin.ModelAdmin):
+#     list_display = ('email', 'name', 'is_staff', 'last_login')
+

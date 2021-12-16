@@ -8,6 +8,7 @@ urlpatterns=[
     path("login/customer",views.customerlogin),
     path("users/customers",views.get_customers),
     path("users/customer_details",views.customer_details),
+    path("users/<uuid:user>",views.details),
     # path("login/vendor",views.vendorlogin),
     # path('signup/vendor',views.signup_as_vendor),
     # path("users/vendors",views.get_vendors),

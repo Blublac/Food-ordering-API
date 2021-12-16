@@ -15,11 +15,11 @@ from django.contrib.auth.signals import user_logged_in
 User = get_user_model()
 
 
-#admin account creation section
+#admin account creation section, only the superuser can create an admin account
 @swagger_auto_schema(methods=["POST"],request_body=Adminserializer())
 @api_view(["POST"])
 @authentication_classes([BasicAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsSuperUser])
 def staff(request):
     if request.method  == "POST":
         serializer = Adminserializer(data=request.data)
@@ -33,9 +33,16 @@ def staff(request):
                 "data":useradmin.data
             }
             return Response(data,status=status.HTTP_201_CREATED)
+        else:
+            error = {
+                "status": False,
+                "error":serializer.errors
+            }
+            return Response (error,status= status.HTTP_400_BAD_REQUEST)
 
 
-#signup section for customers and password hash
+
+#signup section for customers to signup
 @swagger_auto_schema(methods=["POST"],request_body=CustomUserserializer())
 @api_view (["POST"])
 def signup_as_customer(request):
@@ -46,6 +53,7 @@ def signup_as_customer(request):
             user = User.objects.create(**serializer.validated_data)
             user_serializer = CustomUserserializer(user)
 
+
             data={
                 "status": True,
                 "message":"created",
@@ -54,8 +62,15 @@ def signup_as_customer(request):
             }
             return Response(data,status=status.HTTP_201_CREATED)
 
+        else:
+            error = {
+                "status": False,
+                "error":serializer.errors
+            }
+            return Response (error,status= status.HTTP_400_BAD_REQUEST)
             
-
+            
+#this is the login section for all users
 @swagger_auto_schema(methods=(["POST"]),request_body=CustomerLoginserializer())
 @api_view(["POST"])
 def customerlogin(request):
@@ -98,7 +113,7 @@ def customerlogin(request):
 
 
 
-#get all customers
+#get all customers,only a superuser is permitted
 @api_view(["GET",])
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsSuperUser])
@@ -114,31 +129,6 @@ def get_customers(request):
         return Response (data,status=status.HTTP_200_OK)
 
 
-@api_view(["GET","DELETE"])
-@authentication_classes([BasicAuthentication])
-@permission_classes([IsAdminUser])
-def get_A_customers(request,user_id):
-    try:
-        user = User.objects.get(id=user_id,is_active=True)
-    except User.DoesNotExist:
-        raise ValidationError(message="invalid id")
-    if request.method =="GET":
-        serializer = CustomUserserializer(user)
-        data={
-            "status":True,
-            "message":"success",
-            "data": serializer.data
-        }
-        return Response (data,status=status.HTTP_200_OK)
-    elif request.method == "DELETE":
-
-        user.delete()
-        data = {
-            'message':'success'
-        }
-
-
-
 
 
 #customers can get their details also update
@@ -148,9 +138,25 @@ def get_A_customers(request,user_id):
 @permission_classes([IsAuthenticated])
 def customer_details(request):
     try:
-        usersdetails = User.objects.get(id=request.user.id,is_active=True)
+        usersdetails = User.objects.get(id=request.user.id,is_active=True,)
+        if usersdetails.is_staff == True:
+            data = {
+            "message": "failed",
+            "error": "You do not have the permission to view staff details"
+            }
+            return Response(data,status.HTTP_404_NOT_FOUND)
+    
+    
     except User.DoesNotExist:
-        raise ValidationError(message="please login to view details")
+            data = {
+            "message": "failed",
+            "error": "You have to login to view your details"
+            }
+            return Response(data,status.HTTP_404_NOT_FOUND)
+    
+    
+    
+    
     if request.method =="GET":
         serializer = CustomUserserializer(usersdetails)
         data={
@@ -178,113 +184,49 @@ def customer_details(request):
                 'errors': serializer.errors
             }
             return Response(error,status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        usersdetails.delete()
+        data={
+            "status":True,
+            "message": "Deleted"
+        }
+        return Response (data,status=status.HTTP_204_NO_CONTENT)
 
 
 
 
 
+"""this is where admin can deactivate a user"""
+@swagger_auto_schema(methods=(["DELETE"]),request_body=CustomUserserializer())
+@api_view(["GET","DELETE"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsSuperUser])
+def details(request,user):
+    try:
+        userdetails = User.objects.get(id=user,is_active =True)
+    except User.DoesNotExist:
+        data = {
+        "message": "failed",
+        "error": "user does not exist"
+        }
+        return Response(data,status.HTTP_404_NOT_FOUND)
+    
+    if request.method =="GET":
 
-# @swagger_auto_schema(methods=["POST"],request_body=Vendorserializer())
-# @api_view(["POST"])
-# def signup_as_vendor(request):
-#     if request.method == "POST":
-#         serializer = Vendorserializer(data = request.data)
-#         if serializer.is_valid():
-#             serializer.validated_data['password']=make_password(serializer.validated_data['password'])
-#             vendor_data = Vendor.objects.create(**serializer.validated_data)
-#             vendor = Vendorserializer(vendor_data)
+        serializer = CustomUserserializer(userdetails)
+        data={
+            "status":True,
+            "message":"success",
+            "data": serializer.data
+        }
+        return Response (data,status=status.HTTP_200_OK)
 
-#             data={
-#                 "status": True,
-#                 "message": "created",
-#                 "data": vendor.data
-#             }
-#             return Response (data, status=status.HTTP_201_CREATED)
-
-
-
-# @swagger_auto_schema(methods=(["POST"]),request_body=VendorLoginserializer())
-# @api_view(["POST"])
-# def vendorlogin(request):
-#     if request.method == "POST":
-#         serializer = VendorLoginserializer(data=request.data)
-#         if serializer.is_valid():
-#             user = Vendor.objects.get(email= serializer.validated_data["email"],password = serializer.validated_data["password"])
-#             if user:
-#                 if user:
-#                     user_logged_in.send(sender=user.__class__,request=request,user=user)
-#                     log_serializer = Vendorserializer(user)
-#                     data={
-#                         'status':True,
-#                         'message':'login successful',
-#                         'data':log_serializer.data
-#                     }
-#                     return Response(data,status=status.HTTP_202_ACCEPTED)
-                
-#                 else:
-#                     data={
-#                         'status':False,
-#                         'message':'Kindly activate your account'
-#                     }
-#                     return Response(data,status=status.HTTP_400_BAD_REQUEST)
-
-#             else:
-#                 data={
-#                         'status':False,
-#                         'message':'Please enter a valid username and password'
-#                 }
-#                 return Response(data,status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             error={
-#                     'error':serializer.errors
-#             }
-#             return Response(error,status=status.HTTP_401_UNAUTHORIZED)
-
-# #get all vendors
-# @api_view(["GET",])
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAdminUser])
-# def get_vendors(request):
-#     if request.method =="GET":
-#         all_vendors = User.objects.all()
-#         serializer = Vendorserializer(all_vendors,many = True)
-#         data={
-#             "status":True,
-#             "message":"success",
-#             "data": serializer.data
-#         }
-#         return Response (data,status=status.HTTP_200_OK)
-
-
-
-
-# #customers can get their details also update
-# @swagger_auto_schema(methods=(["PATCH","DELETE"]),request_body=Vendorserializer())
-# @api_view(["GET","PATCH","DELETE"])
-# @authentication_classes([BasicAuthentication])
-# @permission_classes([IsAuthenticated])
-# def vendor_details(request):
-#     if request.method =="GET":
-#         try:
-#             vendordetails = User.objects.get(id=request.user.id,is_active =True)
-#         except User.DoesNotExist:
-#             data = {
-#             "message": "failed",
-#             "error": "user with iddoes not exist"
-#         }
-#         return Response(data,status.HTTP_404_NOT_FOUND)
-
-#         serializer = Vendorserializer(vendordetails)
-#         data={
-#             "status":True,
-#             "message":"success",
-#             "data": serializer.data
-#         }
-#         return Response (data,status=status.HTTP_200_OK)
-
-
-
-
-
+    elif request.method == "DELETE":
+        userdetails.delete()
+        data={
+            "status":True,
+            "message": "Deleted"
+        }
+        return Response (data,status=status.HTTP_204_NO_CONTENT)
 
 

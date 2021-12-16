@@ -1,20 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, PROTECT
 import uuid
 
 class Category(models.Model):
-    category_choices=(
-        ('Bakery',('cake','cookies','bread','pies','pizza')),
-        ('rice',('jollof rice','fried rice','chinese rice','rice & stew','coconut rice')),
-        ('roast',('corn','beans & roasted plantain','bole','roasted chicken')),
-        ('barbeque',('grilled chicken','grilled beef','grilled fish','suya')),
-        ('sharwarma',('chicken','beef','chicken jumbo+2hotdog','beef jumbo+2hotdog')),
-    )
-    
-    category = models.CharField(max_length=100,null = True,blank=True,unique=True)
-    subcategory = models.CharField(max_length=100,default=category_choices, unique=True)
-    details = models.TextField()
+    category = models.CharField(max_length=100,primary_key=True,unique=True)
 
     class Meta:
         verbose_name = 'catergory'
@@ -22,13 +12,22 @@ class Category(models.Model):
     
     def __str__(self):
         return self.category
+class Subcategory (models.Model):
+    category = models.ForeignKey(Category,max_length=100,on_delete=CASCADE)
+    subcategory = models.CharField(max_length=50,primary_key=True,unique=True)
+    details = models.TextField()
 
-
-
+    class Meta:
+        verbose_name = 'Subcatergory'
+        verbose_name_plural = "SubCategories"
+    
+    def __str__(self):
+        return self.subcategory
 class Food(models.Model):
-    category = models.ForeignKey(Category,on_delete=CASCADE)
-    sku_no = models.UUIDField(primary_key= True, default=uuid.uuid4,unique=True,editable=False)
-    food = models.CharField(max_length=100,unique=True)
+    subcategory = models.ForeignKey(Subcategory,on_delete=CASCADE)
+    sku_no = models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
+    food = models.CharField(primary_key= True,max_length=100,unique=True)
+    price = models.PositiveBigIntegerField(null=True,blank=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField()
@@ -41,8 +40,8 @@ class Food(models.Model):
 
 
 
-    def __str__(self):
-        return self.food
+    def __unicode__(self):
+        return self.food,self.price
 
 
     
@@ -50,4 +49,3 @@ class Food(models.Model):
         self.is_active = False
         self.save()
         return
-    
