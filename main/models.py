@@ -40,8 +40,8 @@ class Food(models.Model):
 
 
 
-    def __unicode__(self):
-        return self.food,self.price
+    def __str__(self):
+        return f"{self.food},{self.price}"
 
 
     

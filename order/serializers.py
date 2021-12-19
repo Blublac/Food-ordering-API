@@ -8,4 +8,4 @@ User = get_user_model()
 class Orderserializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['order','name','billing_address','unit',]
+        fields = ['order','name','billing_address','unit','order_no']

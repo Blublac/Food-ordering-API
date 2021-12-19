@@ -9,4 +9,6 @@ urlpatterns=[
     path('order/schedule<int:order>',views.order_scheduled),
     path('order/delivered<int:order>',views.order_delivered),
     path('order/failed<int:order>',views.order_failed),
+    path('order/cancelled<int:order>',views.order_cancelled),
+    path('order/completed',views.completed_orders),
 ]

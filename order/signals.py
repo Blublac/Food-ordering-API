@@ -16,7 +16,7 @@ def order_placed(sender,instance,created,**kwargs):
    
     if created:
         #a post save, sends an email to a user after an order has been created
-        message = f"""Hello {instance.name},
+        message = f"""Hello {instance.user.name},
             Your order requesting {instance.unit} unit/units of {instance.order} has been placed and is still pending, kindly wait as we confirm your order. Once order is confirmed you will  get an email on the new update of your order, the delivery address is {instance.billing_address}. Thanks for using our services.
             remember to give us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
@@ -42,7 +42,7 @@ def scheduled(sender,instance,created,**kwargs):
         message = f"""Hello {instance.name},
             Your order has been scheduled and will be delivered in 10mins kindly excercise patience while we deliver your meal. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
-        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order: {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
 
     elif instance.status == "delivered":
 

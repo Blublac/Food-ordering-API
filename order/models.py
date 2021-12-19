@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.deletion import DO_NOTHING
+from django.db.models.deletion import DO_NOTHING, PROTECT
 from accounts.models import CustomUser
 import random
 
@@ -25,7 +25,7 @@ class Order(models.Model):
     is_active = models.BooleanField(default=True)
     order_no = models.IntegerField(primary_key=True,default=generate_order_no,unique=True,editable=False)
     unit = models.PositiveSmallIntegerField(default=1)
-    order = models.ForeignKey(Food,max_length=100,on_delete=DO_NOTHING)
+    order = models.ForeignKey(Food,max_length=100,on_delete=PROTECT)
     name = models.CharField(max_length=50)
     billing_address =  models.TextField()
     time = models.TimeField(auto_now=True)
@@ -38,15 +38,8 @@ class Order(models.Model):
         verbose_name_plural = "Orders"
 
 
-    def __unicode__(self):
-        return self.order_no
+    def __str__(self):
+        return str(self.order_no)
 
 
-    def getname(self):
-        name = CustomUser.objects.filter(name=self)
-        return name
-
-    def getemail(self):
-        email = CustomUser.objects.filter(email=self)
-        return email
  
