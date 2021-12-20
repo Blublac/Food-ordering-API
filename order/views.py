@@ -16,6 +16,8 @@ from order import serializers
 
 User = get_user_model()
 
+
+
 @api_view(['GET'])
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsSuperUser])
@@ -34,29 +36,19 @@ def orders (request):
 
 #this is to place an order
 @swagger_auto_schema(methods=["POST"],request_body=Orderserializer())
-@api_view (["GET","POST"])
+@api_view (["POST"])
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsAuthenticated])
 def place_order(request):
-    
-    if request.method == 'GET':
-        orderlist = Order.objects.values_list('name',flat=True).distinct().filter(user=request.user)
-        data = {
-            orderlist:{
-                'count':Order.objects.filter(name=orderlist).count(),
-                'data':Order.objects.filter(name=orderlist).values()
-                } for orderlist in orderlist
-        }
 
-        return Response(data,status.HTTP_200_OK)
-
-
-    elif request.method =="POST":
+    if request.method =="POST":
         serializer = Orderserializer(data =request.data)
         if serializer.is_valid():
             if 'user' in serializer.validated_data.keys():
                 serializer.validated_data.pop('user')
-            
+
+
+         
             orders = Order.objects.create(**serializer.validated_data,user = request.user)
             orders_serializer = Orderserializer(orders)
 
@@ -207,7 +199,7 @@ def order_failed(request,order):
 
 @api_view (["GET"])
 @authentication_classes([BasicAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def order_cancelled(request,order):
     if request.method == 'GET':
         try:
@@ -230,6 +222,14 @@ def order_cancelled(request,order):
             }
             return Response(data,status.HTTP_202_ACCEPTED)
 
+        else:
+            error = {
+                'status': False,
+                'data': 'pleas contact admin to assist you further'
+            }
+            return Response(error,status.HTTP_202_ACCEPTED)
+
+
 
 
 @api_view (["GET"])
@@ -247,3 +247,22 @@ def completed_orders(request):
                 'data' : serializer.data
         }
         return Response(data,status.HTTP_202_ACCEPTED)
+
+
+
+
+@api_view (["GET"])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def all_user_orders(request):
+    if request.method == 'GET':        
+
+        orderlist = Order.objects.filter(user=request.user).values_list('status',flat=True).distinct()
+        data = {
+            orderlist:{
+                'count':Order.objects.filter(status=orderlist).count(),
+                'data':Order.objects.filter(status=orderlist).values()
+                } for orderlist in orderlist
+        }
+
+        return Response(data,status.HTTP_200_OK)

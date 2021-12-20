@@ -45,7 +45,8 @@ class Food(models.Model):
         return self.food
 
 
-    
+
+
     def delete(self):
         self.is_active = False
         self.save()

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.deletion import DO_NOTHING, PROTECT
+from django.db.models.deletion import CASCADE, DO_NOTHING, PROTECT
 from accounts.models import CustomUser
 import random
 
@@ -26,27 +26,34 @@ class Order(models.Model):
     order_no = models.IntegerField(primary_key=True,default=generate_order_no,unique=True,editable=False)
     unit = models.PositiveSmallIntegerField(default=1)
     order = models.ForeignKey(Food,max_length=100,on_delete=PROTECT)
+    cost = models.IntegerField(null=True,blank=True,)
     name = models.CharField(max_length=50)
     billing_address =  models.TextField()
     time = models.TimeField(auto_now=True)
-    order_date = models.DateField(auto_now=True)
+    order_date = models.DateTimeField(auto_now=True)
     is_completed = models.BooleanField(default=False)
     updated = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Order'
         verbose_name_plural = "Orders"
+        ordering = ['-order_date']
 
 
     def __str__(self):
         return str(self.order_no)
 
 
-    def __str__(self):
-        return self.order
+    def __unicode__(self):
+        return (self.order)
 
     def getprice(self):
-        return self.order.price
+        price = self.order.price
+        unit = self.unit
+        total =price*unit
+        self.cost = total
+        self.save()
+        return self.cost
 
 
  

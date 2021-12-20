@@ -86,21 +86,11 @@ def subcategory (request):
             return Response(error,status=status.HTTP_400_BAD_REQUEST)
 
 @swagger_auto_schema(methods=(['POST']),request_body=FoodSerializer())
-@api_view(['GET','POST'])
+@api_view(['POST'])
 @authentication_classes([BasicAuthentication])
 @permission_classes([IsSuperUser])
 def dishes(request):
-    if request.method == 'GET':
-        all_categories = Food.objects.all()
-        serializer =FoodSerializer(all_categories,many = True)
-        data = {
-            "status":True,
-            "message": "successful",
-            "data": serializer.data
-        }
-        return Response(data,status=status.HTTP_200_OK)
-
-    elif request.method == 'POST':
+    if request.method == 'POST':
         serializer = FoodSerializer(data = request.data)
         if serializer.is_valid():
             new_category =Food.objects.create(**serializer.validated_data)
@@ -120,5 +110,19 @@ def dishes(request):
             }
             return Response(error,status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def dishes_avaliable(request):
+    if request.method == 'GET':
+        all_categories = Food.objects.all()
+        serializer =FoodSerializer(all_categories,many = True)
+        data = {
+            "status":True,
+            "message": "successful",
+            "data": serializer.data
+        }
+        return Response(data,status=status.HTTP_200_OK)
+
+
+        
 
 

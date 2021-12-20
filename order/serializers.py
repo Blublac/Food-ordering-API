@@ -6,8 +6,14 @@ from .models import Order
 
 User = get_user_model()
 
+
+
+
+
 class Orderserializer(serializers.ModelSerializer):
+
+    cost = serializers.ReadOnlyField(source = "getprice")
 
     class Meta:
         model = Order
-        fields = ['order','name','billing_address','unit','order_no',]
+        fields = ['order','name','billing_address','unit','order_no','cost']

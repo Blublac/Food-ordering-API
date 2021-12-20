@@ -15,6 +15,5 @@ class SubCategorySerializer(serializers.ModelSerializer):
 class FoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food
-        fields = '__all__'
-
+        fields ='__all__'
     

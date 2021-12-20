@@ -62,7 +62,7 @@ def scheduled(sender,instance,created,**kwargs):
     elif instance.status == "cancelled":
 
         message = f"""Hello {instance.name},
-            Your order has been cancelled due to some problems, we are really sorry for these issues. Kindly contact the customer support to place to help you complete your order. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
+            Your order has been cancelled, we are really sorry for any issues you may have encountered. Kindly contact the customer support to help you complete your order. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
         send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
 

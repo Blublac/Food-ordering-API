@@ -6,5 +6,5 @@ from order.models import Order
 
 
 class Orderadmin(admin.ModelAdmin):
-    list_display=["order_no","order","user","status"]
+    list_display=["order_no","order","user","status","cost",'order_date']
     search_fields = ['order','order_no','user']
