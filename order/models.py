@@ -42,4 +42,11 @@ class Order(models.Model):
         return str(self.order_no)
 
 
+    def __str__(self):
+        return self.order
+
+    def getprice(self):
+        return self.order.price
+
+
  

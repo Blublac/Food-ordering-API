@@ -56,6 +56,7 @@ def place_order(request):
         if serializer.is_valid():
             if 'user' in serializer.validated_data.keys():
                 serializer.validated_data.pop('user')
+            
             orders = Order.objects.create(**serializer.validated_data,user = request.user)
             orders_serializer = Orderserializer(orders)
 

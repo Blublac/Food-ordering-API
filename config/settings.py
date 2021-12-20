@@ -13,12 +13,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import cloudinary
 
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = os.getenv('ENVIRONMENT', 'development')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -27,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'phiston'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True   #os.getenv('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -116,7 +118,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
@@ -135,6 +137,20 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Setting Cloudinary Configuration Parameters Globally
+
+cloudinary.config( 
+  cloud_name = os.getenv('cloud_name'), 
+  api_key = os.getenv('api_key'), 
+  api_secret = os.getenv('api_secret'),
+  secure = os.getenv('secure')
+)
+
+# Setting the maximum length of the CloudinaryField
+CLOUDINARY = {
+    'max_length': 200,
+}
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST=os.getenv("EMAIL_HOST")

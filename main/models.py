@@ -1,8 +1,8 @@
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
 import uuid
-
 class Category(models.Model):
     category = models.CharField(max_length=100,primary_key=True,unique=True)
 
@@ -27,6 +27,7 @@ class Food(models.Model):
     subcategory = models.ForeignKey(Subcategory,on_delete=CASCADE)
     sku_no = models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
     food = models.CharField(primary_key= True,max_length=100,unique=True)
+    image = CloudinaryField('image',null = True,blank= True)
     price = models.PositiveBigIntegerField(null=True,blank=True)
     created = models.DateTimeField(auto_now=True)
     updated = models.DateTimeField(auto_now=True)
@@ -41,7 +42,7 @@ class Food(models.Model):
 
 
     def __str__(self):
-        return f"{self.food},{self.price}"
+        return self.food
 
 
     
