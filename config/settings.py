@@ -17,10 +17,10 @@ import cloudinary
 
 
 load_dotenv()
+env = os.getenv('ENVIRONMENT', 'development')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = os.getenv('ENVIRONMENT', 'development')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',
     'main',
     'order',
+    'rest_framework',
     'cloudinary',
      #used for documentation
     'drf_yasg',
