@@ -31,7 +31,7 @@ SECRET_KEY = 'key'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True   #os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['foodie-z.herokuapp.com/']
+ALLOWED_HOSTS = ['foodie-z.herokuapp.com']
 
 
 # Application definition
