@@ -103,13 +103,13 @@ if env == 'development':
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
+        'default':{
+            'ENGINE':'django.db.backends.postgresql_psycopg2',
+            'HOST':os.getenv('db_host'),
+            'NAME':os.getenv('db_name'),
+            'USER':os.getenv('db_user'),
+            'PORT':os.getenv('db_port'),
+            'PASSWORD':os.getenv('db_password'),
         }
     }
 
