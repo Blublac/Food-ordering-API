@@ -10,10 +10,10 @@ def send_activation_email(sender,instance,created,**kwargs):
 
     if created:
         message = f"""Hello {instance.name},
-            Welcome,Thank you for joining Phiston today,you can now place your order on Phiston to get your meal delivered to you at your doorstep.
+            Welcome,Thank you for joining foodie-z today,you can now place your order on Phiston to get your meal delivered to you at your doorstep.
             You have a 50% discount for your first order, your choice is an order away. 
         """
-        send_mail(subject="Activation mail",message=message,recipient_list=[instance.email],from_email = 'admin@phiston.com')
+        send_mail(subject="Welcome to Foodie-z",message=message,recipient_list=[instance.email],from_email = 'admin@foodie-z.com')
 
 
     # elif created and CustomUser.is_vendor == True:

@@ -20,7 +20,7 @@ def order_placed(sender,instance,created,**kwargs):
             Your order for {instance.unit} unit(s) cost is {instance.unit*instance.order.price},order number is {instance.order} has been placed and is still pending, kindly wait as we confirm your order. Once order is confirmed you will  get an email on the new update of your order, the delivery address is {instance.billing_address}. Thanks for using our services.
             remember to give us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
-        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@foodie-z.com')
 
 
 
@@ -28,7 +28,7 @@ def order_placed(sender,instance,created,**kwargs):
         message = f"""Hello {'Admin'},
             You have a new order, with order number {instance.order_no} for {instance.unit} unit/s of {instance.order}. Please update the order status and ship immediately
         """
-        send_mail(subject=f"New order ",message=message,recipient_list=['Admin@phiston.com'],from_email = 'admin@phiston.com')
+        send_mail(subject=f"New order ",message=message,recipient_list=['project1mailbox@gmail.com'],from_email = 'admin@foodie-z.com')
 
         
 
@@ -42,14 +42,14 @@ def scheduled(sender,instance,created,**kwargs):
         message = f"""Hello {instance.name},
             Your order has been scheduled and will be delivered in 10mins kindly excercise patience while we deliver your meal. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
-        send_mail(subject=f"Order: {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order: {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'aadmin@foodie-z.com')
 
     elif instance.status == "delivered":
 
         message = f"""Hello {instance.name},
             Your order has been delivered and will be delivered in 10mins kindly excercise patience while we deliver your meal. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
-        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@foodie-z.com')
 
 
     elif instance.status == "failed":
@@ -57,12 +57,12 @@ def scheduled(sender,instance,created,**kwargs):
         message = f"""Hello {instance.name},
             Efforts to deliver your order to you has failed and  kindly contact the delivery agent as soon as possible to recieve your package as the order will be cancelled in the next hour. Thanks for your patronage we hope to see you next time.
         """
-        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@foodie-z.com')
 
     elif instance.status == "cancelled":
 
         message = f"""Hello {instance.name},
             Your order has been cancelled, we are really sorry for any issues you may have encountered. Kindly contact the customer support to help you complete your order. Remember us a feedback and rate us to enable other customers find their best choice. we hope you enjoy your meal 
         """
-        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@phiston.com')
+        send_mail(subject=f"Order {instance.order_no} ",message=message,recipient_list=[instance.user],from_email = 'admin@foodie-z.com')
 
