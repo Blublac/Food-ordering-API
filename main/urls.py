@@ -8,5 +8,5 @@ urlpatterns=[
     path('subcategories',views.subcategory),
     path('dishes',views.dishes),
     path('dishes/all dishes',views.dishes_avaliable),
-    #path('find dish/<str:item>',views.search_dish),
+    path('dishes/update/<str:name>',views.update_dish),
 ]

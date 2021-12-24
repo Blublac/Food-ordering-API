@@ -29,6 +29,13 @@ class CustomerLoginserializer(serializers.Serializer):
     password = serializers.CharField(max_length =500)
 
 
+#change password
+
+class Changepasswordserializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length=500)
+    new_password = serializers.CharField(max_length = 500)
+    re_password = serializers.CharField(max_length = 500)
+
 
 
 # class Vendorserializer(serializers.ModelSerializer):
